@@ -1,0 +1,9 @@
+#maxsite-content-importer .error {
+    border: 1px solid #FF0000 !important;
+}
+
+#maxsite-content-importer .results {
+    font-size: 1.2em;
+    color: green;
+    margin-top: 1.2em;
+}

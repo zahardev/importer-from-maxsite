@@ -58,6 +58,12 @@ class Page_Controller {
 			[ 'jquery' ],
 			IFM_ASSETS_VERSION
 		);
+		wp_enqueue_style(
+			self::IMPORTER_URL . '-css',
+			IFM_PLUGIN_URL . '/assets/css/importer.css',
+			[],
+			IFM_ASSETS_VERSION
+		);
 	}
 
 
