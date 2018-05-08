@@ -13,6 +13,7 @@
                 var isValid = self.validate();
                 if(isValid){
                     self.$loader.show();
+                    self.$results.show();
                     $.ajax({
                         method: "GET",
                         url: ajaxurl,
@@ -21,8 +22,13 @@
                             maxsite_url: self.$maxsiteUrl.val()
                         },
                         success: function(res){
-                            self.$results.text(res.data);
+                            self.$results.html(res.data);
                             self.$loader.hide();
+                        },
+                        error: function(){
+                            self.$loader.hide();
+                            self.$results.hide();
+                            alert('Error!');
                         }
                     });
                 }

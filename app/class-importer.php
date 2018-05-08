@@ -34,6 +34,11 @@ class Importer {
 	private $posts_counter = 0;
 
 	/**
+	 * @var int
+	 */
+	private $images_counter = 0;
+
+	/**
 	 * @var array
 	 */
 	private $errors = [];
@@ -74,21 +79,33 @@ class Importer {
 	 * Function import_maxsite_content
 	 */
 	public function import_maxsite_content() {
-		$maxsite_url = filter_input( INPUT_GET, 'maxsite_url' );
+		set_time_limit(0);
+		$maxsite_url = filter_input( INPUT_GET, 'maxsite_url', FILTER_VALIDATE_URL );
+		if ( ! $maxsite_url ) {
+			wp_send_json_error( __( 'Wrong url!' ) );
+		}
+		$maxsite_url = rtrim($maxsite_url, '/');
 		$this->import_terms( $maxsite_url );
 		$this->import_posts( $maxsite_url );
 
+		$res = __( 'All data has been imported successfully!' );
+
+		$res .= '<br><br><br>' . __( 'Errors:' ) . ' ' . count( $this->errors ) . '<br>';
+
 		if(count($this->errors)){
-			$res = __( 'Data imported with errors!' ) . '</br>';
-			$res .= __('Errors:') . '</br>';
+			$res .= '<ul>';
 			foreach ( $this->errors as $error ) {
-				$res .= $error . '</br>';
+				$res .= '<li>' . $error . '</li>';
 			}
-		} else {
-			$res = __( 'Data imported successfully!' );
+			$res .= '</ul><br><br>';
 		}
 
-		$res .= sprintf( __( 'Imported %d categories and %d pages' ), $this->terms_counter, $this->posts_counter );
+		$res .= sprintf(
+			__( 'Imported %d categories, %d pages and %d images' ),
+			$this->terms_counter,
+			$this->posts_counter,
+			$this->images_counter
+		);
 
 		wp_send_json_success( $res );
 	}
@@ -99,12 +116,18 @@ class Importer {
 	private function import_posts( $maxsite_url ) {
 		$posts = $this->get_posts( $maxsite_url );
 		foreach ( $posts as $post ) {
+			$images_map = $this->import_post_images( $post, $maxsite_url );
+			$content    = $post['page_content'];
+			$content    = str_replace( '[cut]', '<!--more-->', $content );
+			foreach ( $images_map as $from => $to ) {
+				$content = str_replace( $from, $to, $content );
+			}
 			$post_category = [];
 			foreach ( $post['page_categories'] as $page_category ) {
 				$post_category[] = $this->category_term_map[ $page_category ];
 			}
 			$res = wp_insert_post( [
-				'post_content'  => str_replace( '[cut]', '<!--more-->', $post['page_content'] ),
+				'post_content'  => $content,
 				'post_title'    => $post['page_title'],
 				'post_status'   => $post['page_status'],
 				'post_type'     => 'post',
@@ -121,6 +144,93 @@ class Importer {
 				$this->posts_counter ++;
 			}
 		}
+	}
+
+	/**
+	 * @param $post
+	 * @param $maxsite_url
+	 *
+	 * @return array
+	 */
+	private function import_post_images( $post, $maxsite_url ) {
+		$content = $post['page_content'];
+		$content = str_replace("'", '"', $content);
+		$images = array();
+		preg_match_all( '@src="([^"]+)"@' , $content, $images );
+
+		$srcs = $images[1];
+
+		$images_map = [];
+
+		if ( count( $srcs ) ) {
+			$image_extensions = wp_get_ext_types()['image'];
+			$upload_url = str_replace( site_url(), '', wp_upload_dir()['baseurl'] );
+			foreach ( $srcs as $src ) {
+				$extension = wp_check_filetype( $src )['ext'];
+				if ( ! in_array( $extension, $image_extensions ) ) {
+					continue; //download only images
+				}
+				$src_url = ( false === strpos( $src, 'http' ) ) ? $maxsite_url . $src : $src;
+				if ( $file = $this->download_image( $src_url ) ) {
+					$this->images_counter++;
+					$attach_data = $this->insert_attachment( $file );
+					$images_map[$src] = $upload_url . '/' . $attach_data['file'];
+				} else {
+					$this->errors[] = __( 'Could not download image' ) . ' ' . $src;
+				}
+			}
+		}
+		return $images_map;
+	}
+
+	/**
+	 * @param $file
+	 *
+	 * @return mixed
+	 */
+	private function insert_attachment( $file ) {
+		$filename = basename( $file );
+
+		$wp_filetype = wp_check_filetype( $filename, null );
+
+		$attachment = [
+			'post_mime_type' => $wp_filetype['type'],
+			'post_title'     => sanitize_file_name( $filename ),
+			'post_content'   => '',
+			'post_status'    => 'inherit'
+		];
+
+		$attach_id = wp_insert_attachment( $attachment, $file );
+		require_once( ABSPATH . 'wp-admin/includes/image.php' );
+		$attach_data = wp_generate_attachment_metadata( $attach_id, $file );
+		wp_update_attachment_metadata( $attach_id, $attach_data );
+		return $attach_data;
+	}
+
+
+	/**
+	 * @param $src
+	 *
+	 * @return bool|string
+	 */
+	private function download_image( $src ) {
+		$ch        = curl_init( $src );
+		$file_name = basename( $src );
+		$file      = wp_upload_dir()['path'] . '/' . $file_name;
+		$fp        = fopen( $file, 'wb' );
+		curl_setopt( $ch, CURLOPT_FILE, $fp );
+		curl_setopt( $ch, CURLOPT_HEADER, 0 );
+		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, 5 );
+		curl_exec( $ch );
+		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close( $ch );
+		fclose( $fp );
+
+		if ( 200 != $httpcode ) {
+			unlink( $file );
+		}
+
+		return ( 200 == $httpcode ) && file_exists( $file ) ? $file : false;
 	}
 
 	/**

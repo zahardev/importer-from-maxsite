@@ -11,7 +11,10 @@
 		<div class="loader" style="display: none;">
 			<img src="<?php echo IFM_PLUGIN_URL ?>/assets/img/loader-pacman.svg">
 		</div>
-		<div class="results"></div>
+        <div class="results" style="display: none">
+			<?php _e('Importing is in the progress..', IFM_TEXT_DOMAIN); ?>
+        </div>
+
 		<?php submit_button( __( 'Import Content' ), IFM_TEXT_DOMAIN ); ?>
 	</form>
     <?php else : ?>
