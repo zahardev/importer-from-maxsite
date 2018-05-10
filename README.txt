@@ -19,6 +19,11 @@ Steps to import the data from your MaxSite CMS site:
 
 
 == Changelog ==
+= Version 1.2 =
+* Message to install Export API plugin added
+* Added exceptions and messages when endpoint can not be reached
+* Closed template file from direct access
+
 = Version 1.1 =
 * Importing images for posts realized
 * Added README.md file

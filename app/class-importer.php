@@ -79,39 +79,45 @@ class Importer {
 	 * Function import_maxsite_content
 	 */
 	public function import_maxsite_content() {
-		set_time_limit(0);
-		$maxsite_url = filter_input( INPUT_GET, 'maxsite_url', FILTER_VALIDATE_URL );
-		if ( ! $maxsite_url ) {
-			wp_send_json_error( __( 'Wrong url!' ) );
-		}
-		$maxsite_url = rtrim($maxsite_url, '/');
-		$this->import_terms( $maxsite_url );
-		$this->import_posts( $maxsite_url );
-
-		$res = __( 'All data has been imported successfully!' );
-
-		$res .= '<br><br><br>' . __( 'Errors:' ) . ' ' . count( $this->errors ) . '<br>';
-
-		if(count($this->errors)){
-			$res .= '<ul>';
-			foreach ( $this->errors as $error ) {
-				$res .= '<li>' . $error . '</li>';
+		try {
+			set_time_limit( 0 );
+			$maxsite_url = filter_input( INPUT_GET, 'maxsite_url', FILTER_VALIDATE_URL );
+			if ( ! $maxsite_url ) {
+				throw new \Exception(__( 'Wrong url!' ));
 			}
-			$res .= '</ul><br><br>';
+			$maxsite_url = rtrim( $maxsite_url, '/' );
+			$this->import_terms( $maxsite_url );
+			$this->import_posts( $maxsite_url );
+
+			$res = __( 'All data has been imported successfully!' );
+
+			$res .= '<br><br><br>' . __( 'Errors:' ) . ' ' . count( $this->errors ) . '<br>';
+
+			if ( count( $this->errors ) ) {
+				$res .= '<ul>';
+				foreach ( $this->errors as $error ) {
+					$res .= '<li>' . $error . '</li>';
+				}
+				$res .= '</ul><br><br>';
+			}
+
+			$res .= sprintf(
+				__( 'Imported %d categories, %d pages and %d images' ),
+				$this->terms_counter,
+				$this->posts_counter,
+				$this->images_counter
+			);
+
+			wp_send_json_success( $res );
+		} catch ( \Exception $e ) {
+			wp_send_json_error( $e->getMessage() );
 		}
-
-		$res .= sprintf(
-			__( 'Imported %d categories, %d pages and %d images' ),
-			$this->terms_counter,
-			$this->posts_counter,
-			$this->images_counter
-		);
-
-		wp_send_json_success( $res );
 	}
 
 	/**
 	 * @param $maxsite_url
+	 *
+	 * @throws \Exception
 	 */
 	private function import_posts( $maxsite_url ) {
 		$posts = $this->get_posts( $maxsite_url );
@@ -235,6 +241,8 @@ class Importer {
 
 	/**
 	 * @param $maxsite_url
+	 *
+	 * @throws \Exception
 	 */
 	private function import_terms( $maxsite_url ) {
 		$terms = $this->get_terms( $maxsite_url );
@@ -282,6 +290,7 @@ class Importer {
 	 * @param $maxsite_url
 	 *
 	 * @return array|mixed|object|string
+	 * @throws \Exception
 	 */
 	private function get_terms( $maxsite_url ) {
 		if ( empty( $this->terms ) ) {
@@ -297,6 +306,7 @@ class Importer {
 	 * @param $maxsite_url
 	 *
 	 * @return array|mixed|object|string
+	 * @throws \Exception
 	 */
 	private function get_posts( $maxsite_url ) {
 		$url = $maxsite_url . '/' . self::POSTS_ENDPOINT;
@@ -310,32 +320,31 @@ class Importer {
 	 * @param $url
 	 *
 	 * @return mixed|string
+	 * @throws \Exception
 	 */
 	private function get( $url ) {
-		try {
-			$curl = curl_init();
+		$curl = curl_init();
 
-			curl_setopt_array( $curl, array(
-				CURLOPT_URL            => $url,
-				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_TIMEOUT        => 30,
-				CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-				CURLOPT_CUSTOMREQUEST  => "GET",
-				CURLOPT_HTTPHEADER     => array(
-					"cache-control: no-cache"
-				),
-			) );
+		curl_setopt_array( $curl, array(
+			CURLOPT_URL            => $url,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_TIMEOUT        => 30,
+			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST  => "GET",
+			CURLOPT_HTTPHEADER     => array(
+				"cache-control: no-cache"
+			),
+		) );
 
-			$response = curl_exec( $curl );
+		$response = curl_exec( $curl );
+		$httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-			curl_close( $curl );
+		curl_close( $curl );
 
-			return $response;
-		} catch ( \Exception $e ) {
-			$this->errors[] = $e->getMessage();
-		} catch ( \Throwable $e ) {
-			$this->errors[] = $e->getMessage();
+		if ( 200 != $httpcode ) {
+			throw new \Exception(sprintf(__('Url %s can not be reached'), $url));
 		}
-		return false;
+
+		return $response;
 	}
 }

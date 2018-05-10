@@ -1,6 +1,13 @@
+<?php
+if ( ! function_exists( 'add_action' ) ) {
+	exit;
+}
+?>
 <div id="maxsite-content-importer" class="wrap">
 	<h1>Importer From MaxSite</h1>
     <?php if( function_exists('curl_version') ) : ?>
+    <?php printf( __( 'Before importing, please make sure you installed <a target="_blank" href="%s">Export API plugin</a> on your MaxSite CMS site.', IFM_TEXT_DOMAIN ), 'https://github.com/zahardoc/export_api' ); ?>
+    <br><br>
 	<form method="post" action="options.php">
 		<div>
 			<label for="maxsite_url">
@@ -18,6 +25,6 @@
 		<?php submit_button( __( 'Import Content' ), IFM_TEXT_DOMAIN ); ?>
 	</form>
     <?php else : ?>
-        <div><?php echo __('You can not use this plugin: please enable curl module first!'); ?></div>
+        <div><?php _e('You can not use this plugin: please enable curl module first!', IFM_TEXT_DOMAIN); ?></div>
     <?php endif; ?>
 </div>

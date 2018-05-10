@@ -1,9 +1,18 @@
-#maxsite-content-importer .error {
-    border: 1px solid #FF0000 !important;
+#maxsite-content-importer input.error {
+    border: 1px solid #dc3232 !important;
 }
 
 #maxsite-content-importer .results {
     font-size: 1.2em;
-    color: green;
+    color: #007e00;
     margin-top: 1.2em;
+}
+
+#maxsite-content-importer .results .error {
+    color: #dc3232;
+}
+
+#maxsite-content-importer label {
+    font-weight: bold;
+    margin-right: 20px;
 }

@@ -22,7 +22,12 @@
                             maxsite_url: self.$maxsiteUrl.val()
                         },
                         success: function(res){
-                            self.$results.html(res.data);
+                            var resultContainer = $('<div></div>');
+                            if (false === res.success) {
+                                resultContainer.addClass('error');
+                            }
+                            resultContainer.html(res.data);
+                            self.$results.html(resultContainer);
                             self.$loader.hide();
                         },
                         error: function(){
