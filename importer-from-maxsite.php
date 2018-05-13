@@ -4,9 +4,9 @@
  */
 /*
 Plugin Name: Importer From MaxSite
-Plugin URI: https://github.com/
+Plugin URI: https://github.com/zahardoc/importer-from-maxsite
 Description: Plugin Importer From MaxSite provides easy and fast way to move your data from MaxSite CMS to the WordPress.
-Version: 1.2
+Version: 1.3
 Author: Sergey Zaharchenko <zaharchenko.dev@gmail.com>
 Author URI: https://github.com/zahardoc
 License: GPLv3
@@ -27,8 +27,8 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 
 // Make sure we don't expose any info if called directly
-if ( !function_exists( 'add_action' ) ) {
-    exit;
+if ( ! function_exists( 'add_action' ) ) {
+	exit;
 }
 
 define( 'IFM_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );

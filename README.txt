@@ -12,13 +12,18 @@ Plugin Importer From MaxSite provides easy and fast way to move your data from M
 Feel free to submit questions, suggestions, bug reports, concerns, etc. to me.
 
 Steps to import the data from your MaxSite CMS site:
-1. Install "Export API" plugin on the MaxSite CMS site - https://github.com/zahardoc/export_api.
-2. Install this plugin on your WordPress site.
-3. Go to the "Importer From MaxSite" page.
-4. Provide your MaxSite url and click "Import Content" button.
+* Install "Export API" plugin on the MaxSite CMS site - https://github.com/zahardoc/export_api.
+* Install this plugin on your WordPress site.
+* Install Advanced Custom Fields plugin (it is needed to import meta fields).
+* Go to the "Importer From MaxSite" page.
+* Provide your MaxSite url and click "Import Content" button.
 
 
 == Changelog ==
+= Version 1.3 =
+* Importing fields realized (using ACF plugin)
+* Disable submit button after click to prevent multiple submissions.
+
 = Version 1.2 =
 * Message to install Export API plugin added
 * Added exceptions and messages when endpoint can not be reached
