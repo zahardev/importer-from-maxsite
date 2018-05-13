@@ -35,7 +35,7 @@ define( 'IFM_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'IFM_PLUGIN_BASENAME', plugin_basename(__FILE__));
 define( 'IFM_PLUGIN_URL', plugins_url('', __FILE__));
 define( 'IFM_TEXT_DOMAIN', 'importer-from-maxsite');
-define( 'IFM_ASSETS_VERSION', 1.2);
+define( 'IFM_ASSETS_VERSION', 1.3);
 
 require_once __DIR__ . '/app/class-page-controller.php';
 require_once __DIR__ . '/app/class-importer.php';

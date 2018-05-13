@@ -12,6 +12,7 @@
                 e.preventDefault();
                 var isValid = self.validate();
                 if(isValid){
+                    $(this).attr('disabled', 'disabled');
                     self.$loader.show();
                     self.$results.show();
                     $.ajax({
