@@ -5,7 +5,11 @@ if ( ! function_exists( 'add_action' ) ) {
 ?>
 <div id="maxsite-content-importer" class="wrap">
 	<h1>Importer From MaxSite</h1>
-    <?php if( function_exists('curl_version') ) : ?>
+    <?php if( ! function_exists('curl_version')  ) : ?>
+        <div><?php _e('You can not use this plugin: please enable curl module first!', IFM_TEXT_DOMAIN); ?></div>
+    <?php elseif( ! function_exists('utf8_encode') ) :  ?>
+        <div><?php _e('You can not use this plugin: please enable xml module first!', IFM_TEXT_DOMAIN); ?></div>
+    <?php else : ?>
     <?php printf( __( 'Before importing, please make sure you installed <a target="_blank" href="%s">Export API plugin</a> on your MaxSite CMS site.', IFM_TEXT_DOMAIN ), 'https://github.com/zahardoc/export_api' ); ?>
     <br><br>
 	<form method="post" action="options.php">
@@ -19,12 +23,10 @@ if ( ! function_exists( 'add_action' ) ) {
 			<img src="<?php echo IFM_PLUGIN_URL ?>/assets/img/loader-pacman.svg">
 		</div>
         <div class="results" style="display: none">
-			<?php _e('Importing is in the progress..', IFM_TEXT_DOMAIN); ?>
+			<?php _e("Importing is in the progress.. Don't close the page until it is finished!", IFM_TEXT_DOMAIN); ?>
         </div>
 
-		<?php submit_button( __( 'Import Content' ), IFM_TEXT_DOMAIN ); ?>
+		<?php submit_button( __( 'Import Content', IFM_TEXT_DOMAIN ) ); ?>
 	</form>
-    <?php else : ?>
-        <div><?php _e('You can not use this plugin: please enable curl module first!', IFM_TEXT_DOMAIN); ?></div>
     <?php endif; ?>
 </div>
