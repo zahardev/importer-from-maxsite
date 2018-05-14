@@ -10,7 +10,11 @@ if ( ! function_exists( 'add_action' ) ) {
     <?php elseif( ! function_exists('utf8_encode') ) :  ?>
         <div><?php _e('You can not use this plugin: please enable xml module first!', IFM_TEXT_DOMAIN); ?></div>
     <?php else : ?>
-    <?php printf( __( 'Before importing, please make sure you installed <a target="_blank" href="%s">Export API plugin</a> on your MaxSite CMS site.', IFM_TEXT_DOMAIN ), 'https://github.com/zahardoc/export_api' ); ?>
+    <?php printf(
+            __( 'Before importing, please make sure you installed <a target="_blank" href="%s">Export API plugin</a> on your MaxSite CMS site and <a target="_blank" href="%s">Advanced Custom Fields</a> plugin on you WordPress site.', IFM_TEXT_DOMAIN ),
+            'https://github.com/zahardoc/export_api/',
+            'https://wordpress.org/plugins/advanced-custom-fields/'
+        ); ?>
     <br><br>
 	<form method="post" action="options.php">
 		<div>
