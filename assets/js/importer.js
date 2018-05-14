@@ -26,6 +26,8 @@
                             var resultContainer = $('<div></div>');
                             if (false === res.success) {
                                 resultContainer.addClass('error');
+                            } else {
+                                resultContainer.addClass('updated');
                             }
                             resultContainer.html(res.data);
                             self.$results.html(resultContainer);

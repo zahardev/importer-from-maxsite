@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2018-05-14 12:56+0300\n"
-"PO-Revision-Date: 2018-05-14 13:49+0300\n"
+"POT-Creation-Date: 2018-05-14 15:52+0300\n"
+"PO-Revision-Date: 2018-05-14 15:52+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ru\n"
@@ -10,16 +10,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.8.7.1\n"
-"X-Poedit-Basepath: importer-from-maxsite\n"
+"X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-SearchPath-0: .\n"
-"X-Poedit-SearchPath-1: templates/importer.php\n"
 
 #: app/class-importer.php:93
 msgid "Wrong url!"
-msgstr "Неправильный URL!"
+msgstr "Неверный URL!"
 
 #: app/class-importer.php:99
 msgid "All data has been imported successfully!"
@@ -32,8 +31,7 @@ msgstr "Ошибки:"
 #: app/class-importer.php:112
 #, php-format
 msgid "Imported %d categories, %d pages, %d fields and %d images"
-msgstr ""
-"Импортировано %d категорий, %d страниц, %d мета полей and %d изображений"
+msgstr "Импортировано %d категорий, %d страниц, %d мета полей и %d изображений"
 
 #: app/class-importer.php:137
 msgid ""
@@ -61,43 +59,53 @@ msgstr "Не удалось импортировать категорию"
 msgid "Url %s can not be reached"
 msgstr "Url %s недоступен"
 
-#: app/class-page-controller.php:74
+#: app/class-page-controller.php:74 templates/importer.php:7
 msgid "Importer From MaxSite"
 msgstr "Импортер из MaxSite"
 
-#: templates/importer.php:9
+#: app/class-page-controller.php:89
 msgid "You can not use this plugin: please enable curl module first!"
 msgstr ""
-"Вы не можете использовать этот плагин: пожалуйста включите сначала curl php "
+"Вы не можете использовать этот плагин: пожалуйста включите сначала curl "
 "модуль!"
 
-#: templates/importer.php:11
+#: app/class-page-controller.php:92
 msgid "You can not use this plugin: please enable xml module first!"
 msgstr ""
-"Вы не можете использовать этот плагин: пожалуйста включите сначала xml php "
+"Вы не можете использовать этот плагин: пожалуйста включите сначала xml "
 "модуль!"
 
-#: templates/importer.php:14
+#: app/class-page-controller.php:95
+#, php-format
+msgid "Directory %s is not writable"
+msgstr "Папка %s закрыта для записи"
+
+#: templates/importer.php:10
 #, php-format
 msgid ""
 "Before importing, please make sure you installed <a target=\"_blank\" href="
 "\"%s\">Export API plugin</a> on your MaxSite CMS site and <a target=\"_blank"
 "\" href=\"%s\">Advanced Custom Fields</a> plugin on you WordPress site."
 msgstr ""
-"Пожалуйста, перед импортом убедитесь, что Вы установили <a target=\"_blank"
-"\" href=\"%s\">Export API plugin</a> на Ваш MaxSite CMS сайт и <a target="
+"Пожалуйста, перед импортом убедитесь, что Вы установили <a target=\"_blank\" "
+"href=\"%s\">Export API plugin</a> на Ваш MaxSite CMS сайт и <a target="
 "\"_blank\" href=\"%s\">Advanced Custom Fields</a> плагин на Ваш WordPress "
 "сайт."
 
-#: templates/importer.php:22
+#: templates/importer.php:18
 msgid "MaxSite url"
 msgstr ""
 
-#: templates/importer.php:30
-msgid ""
-"Importing is in the progress.. Don't close the page until it is finished!"
-msgstr "Импорт в прогрессе.. Пожалуйста, не закрывайте страницу до окончания!"
+#: templates/importer.php:27
+msgid "Importing.. Please don't close the page until it is finished!"
+msgstr "Импортирую.. Пожалуйста, не закрывайте страницу до окончания!"
 
-#: templates/importer.php:33
+#: templates/importer.php:30
 msgid "Import Content"
 msgstr "Импортировать"
+
+#~ msgid "Directory %s is not writable. Please check permissions!"
+#~ msgstr "Папка %s закрыта для записи. Пожалуйста, проверьте разрешения!"
+
+#~ msgid "Upload directory is not writable. Please check permissions!"
+#~ msgstr "Папка upload закрыта для записи. Пожалуйста, проверьте разрешения!"

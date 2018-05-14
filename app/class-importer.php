@@ -90,15 +90,15 @@ class Importer {
 			ini_set( 'display_startup_errors', 0 );
 			$maxsite_url = filter_input( INPUT_GET, 'maxsite_url', FILTER_VALIDATE_URL );
 			if ( ! $maxsite_url ) {
-				throw new \Exception( __( 'Wrong url!' ) );
+				throw new \Exception( __( 'Wrong url!', IFM_TEXT_DOMAIN ) );
 			}
 			$maxsite_url = rtrim( $maxsite_url, '/' );
 			$this->import_terms( $maxsite_url );
 			$this->import_posts( $maxsite_url );
 
-			$res = __( 'All data has been imported successfully!' );
+			$res = __( 'All data has been imported successfully!', IFM_TEXT_DOMAIN );
 
-			$res .= '<br><br><br>' . __( 'Errors:' ) . ' ' . count( $this->errors ) . '<br>';
+			$res .= '<br><br><br>' . __( 'Errors:', IFM_TEXT_DOMAIN ) . ' ' . count( $this->errors ) . '<br>';
 
 			if ( count( $this->errors ) ) {
 				$res .= '<ul>';
@@ -109,7 +109,7 @@ class Importer {
 			}
 
 			$res .= sprintf(
-				__( 'Imported %d categories, %d pages, %d fields and %d images' ),
+				__( 'Imported %d categories, %d pages, %d fields and %d images', IFM_TEXT_DOMAIN ),
 				$this->terms_counter,
 				$this->posts_counter,
 				$this->fields_counter,
@@ -160,7 +160,7 @@ class Importer {
 			] );
 
 			if ( is_wp_error( $post_id ) ) {
-				$this->errors[] = __( 'Could not import page' ) . ' ' .
+				$this->errors[] = __( 'Could not import page', IFM_TEXT_DOMAIN ) . ' ' .
 				                  $post['page_id'] . ": ( {$post['page_title']} ) ";
 			} else {
 				$this->posts_counter ++;
@@ -417,7 +417,7 @@ class Importer {
 	private function register_field_group() {
 		$group_id = wp_insert_post( [
 			'post_content'  => '',
-			'post_title'    => __( 'Post Fields' ),
+			'post_title'    => __( 'Post Fields', IFM_TEXT_DOMAIN ),
 			'post_status'   => 'publish',
 			'post_type'     => 'acf',
 			'post_password' => '',
@@ -463,7 +463,7 @@ class Importer {
 		);
 
 		if ( is_wp_error( $res ) ) {
-			$this->errors[] = __( 'Could not import category' ) . ' ' . $current_term['category_name'];
+			$this->errors[] = __( 'Could not import category', IFM_TEXT_DOMAIN ) . ' ' . $current_term['category_name'];
 		} else {
 			$this->terms_counter ++;
 			$wp_term_id                                              = $res['term_id'];
@@ -532,7 +532,7 @@ class Importer {
 		curl_close( $curl );
 
 		if ( 200 != $httpcode ) {
-			throw new \Exception( sprintf( __( 'Url %s can not be reached' ), $url ) );
+			throw new \Exception( sprintf( __( 'Url %s can not be reached', IFM_TEXT_DOMAIN ), $url ) );
 		}
 
 		return $response;
