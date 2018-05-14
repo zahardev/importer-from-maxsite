@@ -23,6 +23,7 @@ Steps to import the data from your MaxSite CMS site:
 = Version 1.3 =
 * Importing fields realized (using ACF plugin)
 * Disable submit button after click to prevent multiple submissions.
+* Added Russian translation.
 
 = Version 1.2 =
 * Message to install Export API plugin added

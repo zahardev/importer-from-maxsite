@@ -4,7 +4,7 @@ if ( ! function_exists( 'add_action' ) ) {
 }
 ?>
 <div id="maxsite-content-importer" class="wrap">
-	<h1>Importer From MaxSite</h1>
+	<h1><?php _e( 'Importer From MaxSite', IFM_TEXT_DOMAIN ); ?></h1>
     <?php if( ! function_exists('curl_version')  ) : ?>
         <div><?php _e('You can not use this plugin: please enable curl module first!', IFM_TEXT_DOMAIN); ?></div>
     <?php elseif( ! function_exists('utf8_encode') ) :  ?>

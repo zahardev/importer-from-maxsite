@@ -11,6 +11,7 @@ Author: Sergey Zaharchenko <zaharchenko.dev@gmail.com>
 Author URI: https://github.com/zahardoc
 License: GPLv3
 Text Domain: importer-from-maxsite
+Domain Path: /lang
 */
 
 /*
@@ -36,6 +37,8 @@ define( 'IFM_PLUGIN_BASENAME', plugin_basename(__FILE__));
 define( 'IFM_PLUGIN_URL', plugins_url('', __FILE__));
 define( 'IFM_TEXT_DOMAIN', 'importer-from-maxsite');
 define( 'IFM_ASSETS_VERSION', 1.3);
+
+load_textdomain(IFM_TEXT_DOMAIN, IFM_PLUGIN_DIR . '/lang/ifm-' . get_locale() . '.mo');
 
 require_once __DIR__ . '/app/class-page-controller.php';
 require_once __DIR__ . '/app/class-importer.php';
