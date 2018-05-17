@@ -187,6 +187,7 @@ class Importer {
 			} else {
 				add_post_meta( $post_id, $field_name, $field_value );
 			}
+			add_post_meta( $post_id, '_' . $field_name, $fields_map[ $field_name ]['key'] );
 			$this->fields_counter ++;
 		}
 	}
@@ -330,7 +331,7 @@ class Importer {
 		// Now we can generate acf fields for them
 		$i = 0;
 		foreach ( $fields_map as $field_name => $field ) {
-			$key = 'field_' . wp_generate_password( 13, false );
+			$key = $field['key'];
 
 			$common_settings = [
 				'key'               => $key,
@@ -404,7 +405,10 @@ class Importer {
 					}
 				}
 
-				$fields_map[ $meta_name ] = [ 'is_image' => $is_image ];
+				$fields_map[ $meta_name ] = [
+					'is_image' => $is_image,
+					'key'      => 'field_' . wp_generate_password( 13, false ),
+				];
 			}
 		}
 

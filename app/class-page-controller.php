@@ -47,7 +47,6 @@ class Page_Controller {
 		} );
 		add_action( 'admin_menu', [ $this, 'add_plugin_page' ] );
 		add_action( 'admin_init', [ $this, 'enqueue_assets' ] );
-		$this->enqueue_assets();
 	}
 
 
