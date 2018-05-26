@@ -47,7 +47,6 @@ class Page_Controller {
 		} );
 		add_action( 'admin_menu', [ $this, 'add_plugin_page' ] );
 		add_action( 'admin_init', [ $this, 'enqueue_assets' ] );
-		$this->enqueue_assets();
 	}
 
 
@@ -85,6 +84,17 @@ class Page_Controller {
 	 * Options page callback
 	 */
 	public function render_plugin_page() {
+		if ( ! function_exists( 'curl_version' ) ) {
+			$errors[] = __( 'You can not use this plugin: please enable curl module first!', IFM_TEXT_DOMAIN );
+		}
+		if ( ! function_exists( 'utf8_encode' ) ) {
+			$errors[] = __( 'You can not use this plugin: please enable xml module first!', IFM_TEXT_DOMAIN );
+		}
+		if ( ! is_writable( $upload_path = wp_upload_dir()['path'] ) ) {
+			$error    = __( 'Directory %s is not writable', IFM_TEXT_DOMAIN );
+			$errors[] = sprintf( $error, $upload_path );
+		}
+
 		include IFM_PLUGIN_DIR . '/templates/importer.php';
 	}
 }

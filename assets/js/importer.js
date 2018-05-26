@@ -12,6 +12,7 @@
                 e.preventDefault();
                 var isValid = self.validate();
                 if(isValid){
+                    $(this).attr('disabled', 'disabled');
                     self.$loader.show();
                     self.$results.show();
                     $.ajax({
@@ -25,6 +26,8 @@
                             var resultContainer = $('<div></div>');
                             if (false === res.success) {
                                 resultContainer.addClass('error');
+                            } else {
+                                resultContainer.addClass('updated');
                             }
                             resultContainer.html(res.data);
                             self.$results.html(resultContainer);

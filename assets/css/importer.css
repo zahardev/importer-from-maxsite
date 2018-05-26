@@ -4,12 +4,15 @@
 
 #maxsite-content-importer .results {
     font-size: 1.2em;
-    color: #007e00;
     margin-top: 1.2em;
 }
 
 #maxsite-content-importer .results .error {
     color: #dc3232;
+}
+
+#maxsite-content-importer .results .updated {
+    color:  #007e00;
 }
 
 #maxsite-content-importer label {
