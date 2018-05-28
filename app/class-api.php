@@ -15,6 +15,8 @@ class API {
 
 	const POSTS_ENDPOINT = 'export_api/v1/pages';
 
+	const COMUSERS_ENDPOINT = 'export_api/v1/comusers';
+
 	/**
 	 * @var array
 	 */
@@ -29,8 +31,7 @@ class API {
 	 */
 	public function get_terms( $maxsite_url ) {
 		if ( empty( $this->terms ) ) {
-			$url         = $maxsite_url . '/' . self::CATEGORIES_ENDPOINT;
-			$res         = $this->get( $url );
+			$res         = $this->get( $maxsite_url . '/' . self::CATEGORIES_ENDPOINT );
 			$this->terms = json_decode( $res, true );
 		}
 
@@ -44,11 +45,9 @@ class API {
 	 * @throws \Exception
 	 */
 	public function get_pages( $maxsite_url ) {
-		$url = $maxsite_url . '/' . self::POSTS_ENDPOINT;
-		$res = $this->get( $url );
-		$res = json_decode( $res, true );
+		$res = $this->get( $maxsite_url . '/' . self::POSTS_ENDPOINT );
 
-		return $res;
+		return json_decode( $res, true );
 	}
 
 	/**
@@ -74,6 +73,18 @@ class API {
 		}
 
 		return ( 200 == $httpcode ) && file_exists( $file ) ? $file : false;
+	}
+
+	/**
+	 * @param $maxsite_url
+	 *
+	 * @return array
+	 * @throws \Exception
+	 */
+	public function get_comusers( $maxsite_url ) {
+		$res = $this->get( $maxsite_url . '/' . self::COMUSERS_ENDPOINT );
+
+		return json_decode( $res, true );
 	}
 
 	/**
