@@ -8,30 +8,11 @@ namespace Importer_From_Maxsite;
  * @package Importer_From_Maxsite
  */
 class Page_Controller {
-	/**
-	 * @var
-	 */
-	private static $instance;
+
+	use Singleton;
 
 	const IMPORTER_URL = 'importer-from-maxsite';
 
-
-	/**
-	 * API constructor.
-	 */
-	private function __construct() {
-	}
-
-	/**
-	 * @return Page_Controller
-	 */
-	public static function instance() {
-		if ( empty( self::$instance ) ) {
-			self::$instance = new self;
-		}
-
-		return self::$instance;
-	}
 
 	public function init() {
 		if ( ! is_admin() ) {

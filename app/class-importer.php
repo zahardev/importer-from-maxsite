@@ -8,15 +8,8 @@ namespace Importer_From_Maxsite;
  * @package Importer_From_Maxsite
  */
 class Importer {
-	/**
-	 * @var Importer
-	 */
-	private static $instance;
 
-	/**
-	 * @var array
-	 */
-	private $terms;
+	use Singleton;
 
 	/**
 	 * @var array
@@ -48,27 +41,6 @@ class Importer {
 	 */
 	private $errors = [];
 
-	const CATEGORIES_ENDPOINT = 'export_api/v1/categories';
-
-	const POSTS_ENDPOINT = 'export_api/v1/pages';
-
-
-	/**
-	 * Importer constructor.
-	 */
-	private function __construct() {
-	}
-
-	/**
-	 * @return Importer
-	 */
-	public static function instance() {
-		if ( empty( self::$instance ) ) {
-			self::$instance = new self;
-		}
-
-		return self::$instance;
-	}
 
 	/**
 	 * Function init
@@ -93,6 +65,7 @@ class Importer {
 				throw new \Exception( __( 'Wrong url!', IFM_TEXT_DOMAIN ) );
 			}
 			$maxsite_url = rtrim( $maxsite_url, '/' );
+
 			$this->import_terms( $maxsite_url );
 			$this->import_posts( $maxsite_url );
 
@@ -121,6 +94,7 @@ class Importer {
 			wp_send_json_error( $e->getMessage() );
 		}
 	}
+	
 
 	/**
 	 * @param $maxsite_url
@@ -128,7 +102,7 @@ class Importer {
 	 * @throws \Exception
 	 */
 	private function import_posts( $maxsite_url ) {
-		$pages       = $this->get_pages( $maxsite_url );
+		$pages       = $this->get_api()->get_pages( $maxsite_url );
 		$acf_enabled = function_exists( "register_field_group" );
 		if ( $acf_enabled ) {
 			$fields_map = $this->get_fields_map( $pages );
@@ -184,11 +158,15 @@ class Importer {
 			$field_value = $field[0];
 			if ( $fields_map[ $field_name ]['is_image'] ) {
 				$res = $this->import_image( $field_value, $maxsite_url );
-				add_post_meta( $post_id, $field_name, $res['attachment_id'] );
+				if ( isset( $res['attachment_id'] ) ) {
+					add_post_meta( $post_id, $field_name, $res['attachment_id'] );
+					add_post_meta( $post_id, '_' . $field_name, $fields_map[ $field_name ]['key'] );
+				}
 			} else {
 				add_post_meta( $post_id, $field_name, $field_value );
+				add_post_meta( $post_id, '_' . $field_name, $fields_map[ $field_name ]['key'] );
 			}
-			add_post_meta( $post_id, '_' . $field_name, $fields_map[ $field_name ]['key'] );
+
 			$this->fields_counter ++;
 		}
 	}
@@ -233,12 +211,12 @@ class Importer {
 			return false; //download only images
 		}
 		$src_url = ( false === strpos( $src, 'http' ) ) ? $maxsite_url . $src : $src;
-		if ( $file = $this->download_image( $src_url ) ) {
+		if ( $file = $this->get_api()->download_image( $src_url ) ) {
 			$this->images_counter ++;
-
 			return $this->insert_attachment( $file );
 		} else {
 			$this->errors[] = __( 'Could not download image' ) . ' ' . $src;
+			return false;
 		}
 	}
 
@@ -272,37 +250,12 @@ class Importer {
 
 
 	/**
-	 * @param $src
-	 *
-	 * @return bool|string
-	 */
-	private function download_image( $src ) {
-		$ch        = curl_init( $src );
-		$file_name = basename( $src );
-		$file      = wp_upload_dir()['path'] . '/' . $file_name;
-		$fp        = fopen( $file, 'wb' );
-		curl_setopt( $ch, CURLOPT_FILE, $fp );
-		curl_setopt( $ch, CURLOPT_HEADER, 0 );
-		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, 5 );
-		curl_exec( $ch );
-		$httpcode = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
-		curl_close( $ch );
-		fclose( $fp );
-
-		if ( 200 != $httpcode ) {
-			unlink( $file );
-		}
-
-		return ( 200 == $httpcode ) && file_exists( $file ) ? $file : false;
-	}
-
-	/**
 	 * @param $maxsite_url
 	 *
 	 * @throws \Exception
 	 */
 	private function import_terms( $maxsite_url ) {
-		$terms = $this->get_terms( $maxsite_url );
+		$terms = $this->get_api()->get_terms( $maxsite_url );
 		if ( is_array( $terms ) ) {
 			foreach ( $terms as $term ) {
 				$this->create_hierarchical_terms( $term );
@@ -315,7 +268,7 @@ class Importer {
 	 */
 	private function register_fields( $fields_map ) {
 		$group_id = $this->register_field_group();
-		$fields   = $this->get_fields( $fields_map );
+		$fields   = $this->generate_fields( $fields_map );
 		foreach ( $fields as $field_name => $field_settings ) {
 			add_post_meta( $group_id, $field_name, $field_settings );
 		}
@@ -326,7 +279,7 @@ class Importer {
 	 *
 	 * @return array
 	 */
-	private function get_fields( $fields_map ) {
+	private function generate_fields( $fields_map ) {
 		$fields = [];
 
 		// Now we can generate acf fields for them
@@ -482,64 +435,10 @@ class Importer {
 	}
 
 	/**
-	 * @param $maxsite_url
-	 *
-	 * @return array|mixed|object|string
-	 * @throws \Exception
+	 * @return API
 	 */
-	private function get_terms( $maxsite_url ) {
-		if ( empty( $this->terms ) ) {
-			$url         = $maxsite_url . '/' . self::CATEGORIES_ENDPOINT;
-			$res         = $this->get( $url );
-			$this->terms = json_decode( $res, true );
-		}
-
-		return $this->terms;
+	private function get_api() {
+		return API::instance();
 	}
 
-	/**
-	 * @param $maxsite_url
-	 *
-	 * @return array|mixed|object|string
-	 * @throws \Exception
-	 */
-	private function get_pages( $maxsite_url ) {
-		$url = $maxsite_url . '/' . self::POSTS_ENDPOINT;
-		$res = $this->get( $url );
-		$res = json_decode( $res, true );
-
-		return $res;
-	}
-
-	/**
-	 * @param $url
-	 *
-	 * @return mixed|string
-	 * @throws \Exception
-	 */
-	private function get( $url ) {
-		$curl = curl_init();
-
-		curl_setopt_array( $curl, [
-			CURLOPT_URL            => $url,
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_TIMEOUT        => 30,
-			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST  => "GET",
-			CURLOPT_HTTPHEADER     => [
-				"cache-control: no-cache",
-			],
-		] );
-
-		$response = curl_exec( $curl );
-		$httpcode = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
-
-		curl_close( $curl );
-
-		if ( 200 != $httpcode ) {
-			throw new \Exception( sprintf( __( 'Url %s can not be reached', IFM_TEXT_DOMAIN ), $url ) );
-		}
-
-		return $response;
-	}
 }
