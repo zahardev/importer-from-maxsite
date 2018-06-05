@@ -19,7 +19,24 @@ Steps to import the data from your MaxSite CMS site:
 * Provide your MaxSite url and click "Import Content" button.
 
 
+== Plugin Requirements ==
+PHP version : 5.4 and latest
+WordPress   : Wordpress 4.8 and latest
+
+
+== Screenshots ==
+1. Screenshot 'screenshot-1.png' shows how to start import.
+2. Screenshot 'screenshot-2.png' shows importing process.
+3. Screenshot 'screenshot-3.png' shows importing results.
+
+
 == Changelog ==
+= Version 1.4 =
+* Code refactoring
+* Used native php function to get pages and images
+* Added screenshots
+* Importing fields bugs fixed
+
 = Version 1.3 =
 * Importing fields realized (using ACF plugin)
 * Disable submit button after click to prevent multiple submissions.

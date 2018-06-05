@@ -8,30 +8,11 @@ namespace Importer_From_Maxsite;
  * @package Importer_From_Maxsite
  */
 class Page_Controller {
-	/**
-	 * @var
-	 */
-	private static $instance;
+
+	use Singleton;
 
 	const IMPORTER_URL = 'importer-from-maxsite';
 
-
-	/**
-	 * API constructor.
-	 */
-	private function __construct() {
-	}
-
-	/**
-	 * @return Page_Controller
-	 */
-	public static function instance() {
-		if ( empty( self::$instance ) ) {
-			self::$instance = new self;
-		}
-
-		return self::$instance;
-	}
 
 	public function init() {
 		if ( ! is_admin() ) {
@@ -84,9 +65,6 @@ class Page_Controller {
 	 * Options page callback
 	 */
 	public function render_plugin_page() {
-		if ( ! function_exists( 'curl_version' ) ) {
-			$errors[] = __( 'You can not use this plugin: please enable curl module first!', IFM_TEXT_DOMAIN );
-		}
 		if ( ! function_exists( 'utf8_encode' ) ) {
 			$errors[] = __( 'You can not use this plugin: please enable xml module first!', IFM_TEXT_DOMAIN );
 		}
