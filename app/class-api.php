@@ -56,23 +56,72 @@ class API {
 	 * @return bool|string
 	 */
 	public function download_image( $src ) {
-		$ch        = curl_init( $src );
+
 		$file_name = basename( $src );
 		$file      = wp_upload_dir()['path'] . '/' . $file_name;
-		$fp        = fopen( $file, 'wb' );
-		curl_setopt( $ch, CURLOPT_FILE, $fp );
-		curl_setopt( $ch, CURLOPT_HEADER, 0 );
-		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, 5 );
-		curl_exec( $ch );
-		$httpcode = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
-		curl_close( $ch );
-		fclose( $fp );
 
-		if ( 200 != $httpcode ) {
-			unlink( $file );
+		$tmpfile = $this->download_url( $src, 10 );
+
+		if ( ! is_wp_error( $tmpfile ) ) {
+			copy( $tmpfile, $file );
+			unlink( $tmpfile );
 		}
 
-		return ( 200 == $httpcode ) && file_exists( $file ) ? $file : false;
+		return file_exists( $file ) ? $file : false;
+	}
+
+
+	/**
+	 * This function is the same as WP download_url,
+	 * but it uses just wp_remote_get instead of wp_safe_remote_get
+	 *
+	 *
+	 * @param $url
+	 * @param int $timeout
+	 *
+	 * @return string|\WP_Error
+	 */
+	private function download_url( $url, $timeout = 300 ) {
+
+		if ( ! $url ) {
+			return new \WP_Error( 'http_no_url', __( 'Invalid URL Provided.' ) );
+		}
+
+		$url_filename = basename( parse_url( $url, PHP_URL_PATH ) );
+
+		$tmpfname = wp_tempnam( $url_filename );
+		if ( ! $tmpfname ) {
+			return new \WP_Error( 'http_no_file', __( 'Could not create Temporary file.' ) );
+		}
+
+		$response = wp_remote_get( $url, [ 'timeout'  => $timeout,
+		                                   'stream'   => true,
+		                                   'filename' => $tmpfname,
+		] );
+
+		if ( is_wp_error( $response ) ) {
+			unlink( $tmpfname );
+
+			return $response;
+		}
+
+		if ( 200 != wp_remote_retrieve_response_code( $response ) ) {
+			unlink( $tmpfname );
+
+			return new \WP_Error( 'http_404', trim( wp_remote_retrieve_response_message( $response ) ) );
+		}
+
+		$content_md5 = wp_remote_retrieve_header( $response, 'content-md5' );
+		if ( $content_md5 ) {
+			$md5_check = verify_file_md5( $tmpfname, $content_md5 );
+			if ( is_wp_error( $md5_check ) ) {
+				unlink( $tmpfname );
+
+				return $md5_check;
+			}
+		}
+
+		return $tmpfname;
 	}
 
 	/**
@@ -94,28 +143,13 @@ class API {
 	 * @throws \Exception
 	 */
 	private function get( $url ) {
-		$curl = curl_init();
+		$response  = wp_remote_get( $url );
+		$http_code = wp_remote_retrieve_response_code( $response );
 
-		curl_setopt_array( $curl, [
-			CURLOPT_URL            => $url,
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_TIMEOUT        => 30,
-			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST  => "GET",
-			CURLOPT_HTTPHEADER     => [
-				"cache-control: no-cache",
-			],
-		] );
-
-		$response = curl_exec( $curl );
-		$httpcode = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
-
-		curl_close( $curl );
-
-		if ( 200 != $httpcode ) {
+		if ( 200 != $http_code ) {
 			throw new \Exception( sprintf( __( 'Url %s can not be reached', IFM_TEXT_DOMAIN ), $url ) );
 		}
 
-		return $response;
+		return wp_remote_retrieve_body( $response );
 	}
 }
