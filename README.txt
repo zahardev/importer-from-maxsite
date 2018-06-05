@@ -35,6 +35,7 @@ WordPress   : Wordpress 4.8 and latest
 * Code refactoring
 * Used native php function to get pages and images
 * Added screenshots
+* Importing fields bugs fixed
 
 = Version 1.3 =
 * Importing fields realized (using ACF plugin)
