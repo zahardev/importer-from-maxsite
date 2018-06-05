@@ -37,16 +37,6 @@ class Importer {
 	private $fields_counter = 0;
 
 	/**
-	 * @var int
-	 */
-	private $comusers_counter = 0;
-
-	/**
-	 * @var int
-	 */
-	private $comments_counter = 0;
-
-	/**
 	 * @var array
 	 */
 	private $errors = [];
@@ -76,7 +66,6 @@ class Importer {
 			}
 			$maxsite_url = rtrim( $maxsite_url, '/' );
 
-			$this->import_comusers( $maxsite_url );
 			$this->import_terms( $maxsite_url );
 			$this->import_posts( $maxsite_url );
 
@@ -93,14 +82,11 @@ class Importer {
 			}
 
 			$res .= sprintf(
-				__( 'Imported %d categories, %d pages, %d fields, %d images, %d comusers and %d comments',
-					IFM_TEXT_DOMAIN ),
+				__( 'Imported %d categories, %d pages, %d fields and %d images', IFM_TEXT_DOMAIN ),
 				$this->terms_counter,
 				$this->posts_counter,
 				$this->fields_counter,
-				$this->images_counter,
-				$this->comusers_counter,
-				$this->comments_counter
+				$this->images_counter
 			);
 
 			wp_send_json_success( $res );
@@ -108,40 +94,7 @@ class Importer {
 			wp_send_json_error( $e->getMessage() );
 		}
 	}
-
-	/**
-	 * @param $maxsite_url
-	 *
-	 * @return int Number of imported comusers
-	 * @throws \Exception
-	 */
-	private function import_comusers( $maxsite_url ) {
-		$comusers = $this->get_api()->get_comusers( $maxsite_url );
-		foreach ( $comusers as $comuser ) {
-			$user_email = filter_var( $comuser['comusers_email'], FILTER_VALIDATE_EMAIL );
-			if ( $user_email && false === email_exists( $user_email ) ) {
-				$res = wp_insert_user( [
-					'user_login'           => wp_slash( $user_email ),
-					'user_url'             => filter_var( $comuser['comusers_url'], FILTER_SANITIZE_URL ),
-					'display_name'         => $comuser['comusers_nik'],
-					'user_email'           => wp_slash( $user_email ),
-					'user_pass'            => wp_generate_password( 12, false ),
-					'user_registered'      => $comuser['comusers_date_registr'],
-					'show_admin_bar_front' => false,
-					'role'                 => 'subscriber',
-				] );
-
-				if ( is_wp_error( $res ) ) {
-					$this->errors[] = $res->get_error_message();
-				} else {
-					$this->comusers_counter ++;
-				}
-			}
-		}
-
-		return $this->comusers_counter;
-	}
-
+	
 
 	/**
 	 * @param $maxsite_url
@@ -189,56 +142,8 @@ class Importer {
 				if ( $acf_enabled ) {
 					$this->import_post_fields( $post_id, $page, $fields_map, $maxsite_url );
 				}
-				$this->import_post_comments( $post_id, $page['page_comments'] );
 			}
 		}
-	}
-
-
-	private function import_post_comments( $post_id, $comments ) {
-		$email_authors_map = $this->get_email_authors_map();
-		foreach ( $comments as $comment ) {
-			$comment_author_email = $comment['comusers_email'] ?: $comment['users_email'];
-
-			//lets try to find author by email
-			$comment_author = $comment['comments_author_name'] ?: $comment['comusers_nik'] ?: $comment['users_nik'];
-
-			$data = [
-				'comment_post_ID'      => $post_id,
-				'comment_author_email' => $comment_author_email,
-				'comment_content'      => $comment['comments_content'],
-				'comment_type'         => '',
-				'comment_parent'       => 0,
-				'comment_author_IP'    => $comment['comments_author_ip'],
-				'comment_date'         => $comment['comments_date'],
-				'comment_approved'     => $comment['comments_approved'],
-				'comment_author'       => $comment_author,
-			];
-
-			$user = isset( $email_authors_map[ $comment_author_email ] ) ? $email_authors_map[ $comment_author_email ] : null;
-
-			if ( $user ) {
-				$data['user_id'] = $user->ID;
-			}
-
-			$res = wp_insert_comment( $data );
-			if ( $res ) {
-				$this->comments_counter ++;
-			} else {
-				$this->errors[] = __( 'Could not import comment for post ', IFM_TEXT_DOMAIN ) . $post_id;
-			}
-		}
-	}
-
-	public function get_email_authors_map() {
-		$users = get_users();
-
-		$map = [];
-		foreach ( $users as $user ) {
-			$map[ $user->data->user_email ] = $user->data;
-		}
-
-		return $map;
 	}
 
 
@@ -308,11 +213,9 @@ class Importer {
 		$src_url = ( false === strpos( $src, 'http' ) ) ? $maxsite_url . $src : $src;
 		if ( $file = $this->get_api()->download_image( $src_url ) ) {
 			$this->images_counter ++;
-
 			return $this->insert_attachment( $file );
 		} else {
 			$this->errors[] = __( 'Could not download image' ) . ' ' . $src;
-
 			return false;
 		}
 	}
