@@ -65,9 +65,6 @@ class Page_Controller {
 	 * Options page callback
 	 */
 	public function render_plugin_page() {
-		if ( ! function_exists( 'curl_version' ) ) {
-			$errors[] = __( 'You can not use this plugin: please enable curl module first!', IFM_TEXT_DOMAIN );
-		}
 		if ( ! function_exists( 'utf8_encode' ) ) {
 			$errors[] = __( 'You can not use this plugin: please enable xml module first!', IFM_TEXT_DOMAIN );
 		}
