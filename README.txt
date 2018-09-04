@@ -1,5 +1,5 @@
 === Importer From MaxSite ===
-Contributors: zahardoc
+Contributors: zahardoc, erommel
 Tags: maxsite, import, wordpress
 Requires at least: 4.8
 Tested up to: 4.9.5
