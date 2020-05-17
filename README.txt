@@ -10,27 +10,36 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 == Description ==
 Plugin Importer From MaxSite provides easy and fast way to move your data from MaxSite CMS to the WordPress.
-For now, it imports pages, categories, meta fields and images.
+It imports categories, pages, images, comments and meta fields (if ACF plugin is installed).
 
 Warning!
 Please use new WordPress installation for importing and do not try to do it on your production site directly!
 
 Steps to import the data from your MaxSite CMS site:
 * Install "Export API" plugin on the MaxSite CMS site - https://github.com/zahardoc/export_api.
+  > Please, make sure that plugin folder name is "export_api", not "export_api-master"
 * Install this plugin on your WordPress site.
 * Install Advanced Custom Fields plugin (it is needed to import meta fields).
 * Go to the "Importer From MaxSite" page.
 * Provide your MaxSite url and click "Import Content" button.
+* Don't forget to disable "Export API" plugin on your MaxSite right after the importing!
 
 Feel free to submit questions, suggestions, bug reports, concerns, etc. to me.
 
 
 == Plugin Requirements ==
-PHP version : 5.4 and latest
+PHP version : 5.6 and latest
 WordPress   : Wordpress 4.8 and latest
 
 
 == Frequently Asked Questions ==
+= Plugin doesn't work =
+Please check following possible reasons:
+1. The "Export API" plugin is not installed on MaxSite.
+2. The "Export API" plugin folder name is not "export_api".
+3. MaxSite site doesn't work or returns errors. Please check this url- https://your-site/export_api/v1/categories.
+   It should return valid JSON.
+
 = What if I don't need to import meta fields? =
 Just don't install Advanced Custom Fields plugin - meta fields importing will be skipped.
 
@@ -45,6 +54,10 @@ Just write me and we'll think what to do :) I speak Russian :)
 
 
 == Upgrade Notice ==
+= 1.5 =
+* Importing comments
+* Updated readme
+
 = 1.4 =
 * Code refactoring
 * Used native php function to get pages and images
