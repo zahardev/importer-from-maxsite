@@ -36,6 +36,11 @@ class Importer {
 	 */
 	private $fields_counter = 0;
 
+    /**
+     * @var int
+     */
+    private $comments_counter = 0;
+
 	/**
 	 * @var array
 	 */
@@ -82,9 +87,10 @@ class Importer {
 			}
 
 			$res .= sprintf(
-				__( 'Imported %d categories, %d pages, %d fields and %d images', IFM_TEXT_DOMAIN ),
+				__( 'Imported %d categories, %d pages, %d comments, %d fields and %d images', IFM_TEXT_DOMAIN ),
 				$this->terms_counter,
 				$this->posts_counter,
+				$this->comments_counter,
 				$this->fields_counter,
 				$this->images_counter
 			);
@@ -94,7 +100,7 @@ class Importer {
 			wp_send_json_error( $e->getMessage() );
 		}
 	}
-	
+
 
 	/**
 	 * @param $maxsite_url
@@ -139,12 +145,45 @@ class Importer {
 				                  $page['page_id'] . ": ( {$page['page_title']} ) ";
 			} else {
 				$this->posts_counter ++;
+
+                foreach ( $page['page_comments'] as $comment ) {
+                    $this->import_comment( $post_id, $comment );
+                }
+
 				if ( $acf_enabled ) {
 					$this->import_post_fields( $post_id, $page, $fields_map, $maxsite_url );
 				}
 			}
 		}
 	}
+
+    /**
+     * @param $post_id
+     * @param $comment
+     *
+     * @return false|int
+     */
+    private function import_comment( $post_id, $comment ) {
+        $data = [
+            'comment_author'       => ! empty( $comment['comments_author_name'] ) ? $comment['comments_author_name'] : $comment['comusers_nik'],
+            'comment_author_email' => $comment['comusers_email'],
+            'comment_author_url'   => $comment['comusers_url'],
+            'comment_author_IP'    => $comment['comments_author_ip'],
+            'comment_date'         => $comment['comments_date'],
+            'comment_content'      => $comment['comments_content'],
+            'comment_karma'        => $comment['comments_rating'],
+            'comment_approved'     => $comment['comments_approved'],
+            'comment_post_ID'      => $post_id,
+        ];
+
+        if ( $res = wp_insert_comment( $data ) ) {
+            $this->comments_counter ++;
+        } else {
+            $this->errors[] = __( 'Could not import comment on the page', IFM_TEXT_DOMAIN ) . ' ' . $post_id;
+        }
+
+        return $res;
+    }
 
 
 	/**

@@ -131,14 +131,22 @@ class API {
 	 * @return mixed|string
 	 * @throws \Exception
 	 */
-	private function get( $url ) {
-		$response  = wp_remote_get( $url );
-		$http_code = wp_remote_retrieve_response_code( $response );
+    private function get( $url ) {
+        $increase_timeout = function ( $timeout ) {
+            return 60;
+        };
+        add_filter( 'http_request_timeout', $increase_timeout );
 
-		if ( 200 != $http_code ) {
-			throw new \Exception( sprintf( __( 'Url %s can not be reached', IFM_TEXT_DOMAIN ), $url ) );
-		}
+        $response = wp_remote_get( $url );
 
-		return wp_remote_retrieve_body( $response );
-	}
+        remove_filter( 'http_request_timeout', $increase_timeout );
+
+        $http_code = wp_remote_retrieve_response_code( $response );
+
+        if ( 200 != $http_code ) {
+            throw new \Exception( sprintf( __( 'Url %s can not be reached', IFM_TEXT_DOMAIN ), $url ) );
+        }
+
+        return wp_remote_retrieve_body( $response );
+    }
 }
