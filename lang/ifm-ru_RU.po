@@ -1,81 +1,89 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2018-05-14 15:52+0300\n"
-"PO-Revision-Date: 2018-05-14 15:52+0300\n"
+"POT-Creation-Date: 2020-05-17 12:00+0300\n"
+"PO-Revision-Date: 2020-05-17 12:43+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.7.1\n"
+"X-Generator: Poedit 2.3.1\n"
 "X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: app/class-importer.php:93
-msgid "Wrong url!"
-msgstr "Неверный URL!"
+#: app/class-api.php:90
+msgid "Invalid URL Provided."
+msgstr "Недопустимый URL-адрес."
 
-#: app/class-importer.php:99
-msgid "All data has been imported successfully!"
-msgstr "Все данные были успешно импортированы!"
+#: app/class-api.php:97
+msgid "Could not create Temporary file."
+msgstr "Не удалось создать временный файл."
 
-#: app/class-importer.php:101
-msgid "Errors:"
-msgstr "Ошибки:"
-
-#: app/class-importer.php:112
-#, php-format
-msgid "Imported %d categories, %d pages, %d fields and %d images"
-msgstr "Импортировано %d категорий, %d страниц, %d мета полей и %d изображений"
-
-#: app/class-importer.php:137
-msgid ""
-"Could not find Advanced Custom Fields plugin, skipped importing meta fields"
-msgstr "Плагин Advanced Custom Fields не найден, импорт мета полей пропущен"
-
-#: app/class-importer.php:163
-msgid "Could not import page"
-msgstr "Не удалось импортировать страницу"
-
-#: app/class-importer.php:239
-msgid "Could not download image"
-msgstr "Не удалось импортировать изображение"
-
-#: app/class-importer.php:420
-msgid "Post Fields"
-msgstr ""
-
-#: app/class-importer.php:466
-msgid "Could not import category"
-msgstr "Не удалось импортировать категорию"
-
-#: app/class-importer.php:535
+#: app/class-api.php:149
 #, php-format
 msgid "Url %s can not be reached"
 msgstr "Url %s недоступен"
 
-#: app/class-page-controller.php:74 templates/importer.php:7
+#: app/class-importer.php:70
+msgid "Wrong url!"
+msgstr "Неверный URL!"
+
+#: app/class-importer.php:77
+msgid "All data has been imported successfully!"
+msgstr "Все данные были успешно импортированы!"
+
+#: app/class-importer.php:79
+msgid "Errors:"
+msgstr "Ошибки:"
+
+#: app/class-importer.php:90
+#, php-format
+msgid "Imported %d categories, %d pages, %d comments, %d fields and %d images"
+msgstr ""
+"Импортировано %d категорий, %d страниц, %d комментариев, %d мета полей и %d "
+"изображений"
+
+#: app/class-importer.php:117
+msgid ""
+"Could not find Advanced Custom Fields plugin, skipped importing meta fields"
+msgstr "Плагин Advanced Custom Fields не найден, импорт мета полей пропущен"
+
+#: app/class-importer.php:144
+msgid "Could not import page"
+msgstr "Не удалось импортировать страницу"
+
+#: app/class-importer.php:182
+msgid "Could not import comment on the page"
+msgstr "Не удалось импортировать комментарий на странице"
+
+#: app/class-importer.php:257
+msgid "Could not download image"
+msgstr "Не удалось импортировать изображение"
+
+#: app/class-importer.php:417
+msgid "Post Fields"
+msgstr ""
+
+#: app/class-importer.php:463
+msgid "Could not import category"
+msgstr "Не удалось импортировать категорию"
+
+#: app/class-page-controller.php:54 templates/importer.php:7
 msgid "Importer From MaxSite"
 msgstr "Импортер из MaxSite"
 
-#: app/class-page-controller.php:89
-msgid "You can not use this plugin: please enable curl module first!"
-msgstr ""
-"Вы не можете использовать этот плагин: пожалуйста включите сначала curl "
-"модуль!"
-
-#: app/class-page-controller.php:92
+#: app/class-page-controller.php:69
 msgid "You can not use this plugin: please enable xml module first!"
 msgstr ""
 "Вы не можете использовать этот плагин: пожалуйста включите сначала xml "
 "модуль!"
 
-#: app/class-page-controller.php:95
+#: app/class-page-controller.php:72
 #, php-format
 msgid "Directory %s is not writable"
 msgstr "Папка %s закрыта для записи"
@@ -103,6 +111,11 @@ msgstr "Импортирую.. Пожалуйста, не закрывайте �
 #: templates/importer.php:30
 msgid "Import Content"
 msgstr "Импортировать"
+
+#~ msgid "You can not use this plugin: please enable curl module first!"
+#~ msgstr ""
+#~ "Вы не можете использовать этот плагин: пожалуйста включите сначала curl "
+#~ "модуль!"
 
 #~ msgid "Directory %s is not writable. Please check permissions!"
 #~ msgstr "Папка %s закрыта для записи. Пожалуйста, проверьте разрешения!"
